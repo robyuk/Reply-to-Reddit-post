@@ -2,12 +2,13 @@
 # Author: Ardit Sulce, Automate Everything with Python, Udemy
 # Course URL: https://www.udemy.com/course/automate-everything-with-python/
 #
-# This script retrieves the posts in a subreddit and outputs those created in the last 24 hours to outfile
+# This script posts to the pythonsandlot subreddit
 #
+# NO LONGER WORKS! pythonsandlot subreddit is now restricted
+# ================
 # Modified by robertay 7 November 2022
 # - Get client_sevret credentials for environment variables
-# - Use unix time and get posts created in the last delta seconds rather than converting the post.created time to datetime format.  Fewer conversions so should be more efficient when used on a busy subreddit.
-# - Added comments to explain what is going on
+# - Added comments so we know what is going on
 
 # Before running this script, got to reddit.com and create a user account if you havn't already.  Then go to: https://www.reddit.com/prefs/apps 
 # and click on "create an app".  Give your app a name and select the "script" button.
@@ -19,14 +20,9 @@
 # Put all these details into environment variables
 
 import praw   # External module for reddit
-from datetime import datetime
-from time import time
 from os import getenv
 
-subreddit_name='Jokes'
-age=8640  # Maximum age of the posts, number of seconds in 2.4 hours
-outfile='output.txt'
-spacer="-" * 80
+subreddit_name='pythonsandlot'
 
 # Create an instance of the reddit class with your reddit account details
 reddit = praw.Reddit(user_agent=True, 
@@ -37,14 +33,14 @@ reddit = praw.Reddit(user_agent=True,
 
 # Create a subreddit instance
 subreddit = reddit.subreddit(subreddit_name)
+subreddit.validate_on_submit=True   # Avoids a deprecation warning
 
-# Get the current time
-current_time = time()
+# Create title and content of the post
+title="This is my first post using python!"
+content="""
+Hey, I am trying out python posts
+Lets see if this works!
+"""
 
-# Cycle through the recent posts for those created in the last age seconds and write them to the outfile
-with open(outfile, 'w') as file:
-  for post in subreddit.new():
-    delta_time = current_time - post.created
-    if delta_time <= age:
-      file.write(f'{post.title}\n{post.selftext}\n{spacer}\n\n')
-
+# Submit the post
+subreddit.submit(title=title, selftext=content)
